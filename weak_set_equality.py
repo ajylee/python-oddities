@@ -46,6 +46,7 @@ def test_equality():
 
     class MySet(set):
         """Patch the bad behavior"""
+
         def __xor__(self, other):
             try:
                 super().__xor__(other)
@@ -67,14 +68,19 @@ def test_equality():
     assert eq({x}, WeakSet([x]))
     assert eq(WeakSet([x]), {x})
 
-    """Alternatively, subclass WeakSet and override __eq__"""
+    """
+    Solution Attempt 3: Set Containment and length
 
-    class MyWeakSet(WeakSet):
-        __eq__ = eq
+    This is probably the most efficient.
+    """
 
-    assert MyWeakSet([x]) == {x}
-    assert {x} == MyWeakSet([x])
-    assert set() == MyWeakSet()
+    class MyWeakSet2(WeakSet):
+        def __eq__(self, other) -> bool:
+            return len(self) == len(other) and other <= self
+
+    assert MyWeakSet2([x]) == {x}
+    assert {x} == MyWeakSet2([x])
+    assert set() == MyWeakSet2()
 
 
 if __name__ == '__main__':
